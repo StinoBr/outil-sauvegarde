@@ -6,6 +6,7 @@ const SECRET_KEY = appConfig.encryptionSecret.padEnd(32, '0').slice(0, 32);
 const IV_LENGTH = 16;
 
 const key = scryptSync(SECRET_KEY, 'salt', 32);
+const LEGACY_IV = Buffer.alloc(IV_LENGTH, 0);
 
 export function encrypt(text: string): string {
   const iv = randomBytes(IV_LENGTH);
@@ -16,15 +17,36 @@ export function encrypt(text: string): string {
 }
 
 export function decrypt(encryptedText: string): string {
+  if (!encryptedText) {
+    return '';
+  }
+
   const [ivHex, content] = encryptedText.split(':');
-  const iv = Buffer.from(ivHex, 'hex');
+
+  if (!content) {
+    return decryptLegacy(encryptedText);
+  }
+
   try {
+    const iv = Buffer.from(ivHex, 'hex');
     const decipher = createDecipheriv(ALGORITHM, key, iv);
     let decrypted = decipher.update(content, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
   } catch (error) {
     console.error('Erreur de déchiffrement:', error);
+    return decryptLegacy(encryptedText);
+  }
+}
+
+function decryptLegacy(encryptedText: string): string {
+  try {
+    const decipher = createDecipheriv(ALGORITHM, key, LEGACY_IV);
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  } catch (legacyError) {
+    console.error('Erreur de déchiffrement (legacy):', legacyError);
     return '';
   }
 }
