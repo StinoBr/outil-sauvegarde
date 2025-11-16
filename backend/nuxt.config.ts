@@ -26,6 +26,10 @@ export default defineNuxtConfig({
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         }
       }
+    },
+    externals: {
+      traceInclude: ['node-cron'],
+      external: ['node-cron']
     }
   }
 })

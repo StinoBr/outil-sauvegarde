@@ -1,8 +1,7 @@
 import { join } from 'node:path';
 import { unlink } from 'node:fs/promises';
 import type { PlanSauvegarde, SGBDCible, DestinationStockage } from '@prisma/client';
-import { StatutOperation, TypeSGBD } from '@prisma/client';
-import { db } from '../utils/db';
+import { db, StatutOperation, TypeSGBD } from '../utils/db';
 import { executeStreamCommand, type ShellResult } from '../utils/process';
 import { ensureFileDirectory, getFileSize } from '../utils/fileSystem';
 import { compressFile, type CompressionFormat } from '../utils/compression';
