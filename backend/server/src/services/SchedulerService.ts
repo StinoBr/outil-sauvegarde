@@ -17,7 +17,7 @@ export class SchedulerService {
       stopJob(plan.id);
       return;
     }
-    scheduleJob(plan.id, plan.frequenceCron, async () => {
+    await scheduleJob(plan.id, plan.frequenceCron, async () => {
       await this.backupService.executeBackup(plan.id);
     });
     logger.info({ planId: plan.id }, 'Plan ajouté au scheduler');

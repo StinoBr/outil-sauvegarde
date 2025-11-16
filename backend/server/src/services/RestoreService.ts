@@ -1,8 +1,7 @@
 import { join } from 'node:path';
 import { unlink } from 'node:fs/promises';
 import type { JournalSauvegarde, PlanSauvegarde, SGBDCible } from '@prisma/client';
-import { StatutOperation } from '@prisma/client';
-import { db } from '../utils/db';
+import { db, StatutOperation } from '../utils/db';
 import { executeStreamInCommand } from '../utils/process';
 import { logger } from '../utils/logger';
 import { buildStrategy } from '../strategies/strategyFactory';

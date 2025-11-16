@@ -3,11 +3,13 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "predev": "prisma generate",
+    "prebuild": "prisma generate",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare && prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
