@@ -1,7 +1,7 @@
 // backend/server/api/sgbd-targets.post.ts
 
-import { db } from '~/server/utils/db';
-import { encrypt } from '~/server/utils/crypto'; // On importe notre chiffreur
+import { db } from '~/server/src/utils/db';
+import { encrypt } from '~/server/src/utils/crypto';
 import { TypeSGBD } from '@prisma/client';
 
 // defineEventHandler est le constructeur d'endpoint de Nitro

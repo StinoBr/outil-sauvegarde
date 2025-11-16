@@ -1,5 +1,5 @@
 // backend/server/api/destinations.get.ts
-import { db } from '~/server/utils/db';
+import { db } from '~/server/src/utils/db';
 
 export default defineEventHandler(async (event) => {
   try {

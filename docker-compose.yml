@@ -1,35 +1,62 @@
-# Fichier : G:/Projet Bright/Outil de sauvegarde/projet-master-sauvegarde/docker-compose.yml
-
 version: '3.8'
 
 services:
-  # --- Le service pour tester MySQL ---
-  mysql_test:
-    image: mysql:8.0
-    container_name: projet-mysql-test
-    environment:
-      MYSQL_ROOT_PASSWORD: 'rootpassword'
-      MYSQL_DATABASE: 'test_db'
+  backend:
+    image: node:20
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./backend:/app
+      - backups_data:/app/.data/backups
     ports:
-      # Port de votre machine (hôte) : Port du conteneur
-      - "9000:3306"
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres_app:5432/backup
+      BACKUP_ROOT: /app/.data/backups
+    depends_on:
+      - postgres_app
+
+  postgres_app:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: backup
+    ports:
+      - "5450:5432"
+    volumes:
+      - postgres_app_data:/var/lib/postgresql/data
+
+  mysql_target:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: target_mysql
+    ports:
+      - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # --- Le service pour tester PostgreSQL ---
-  postgres_test:
+  postgres_target:
     image: postgres:14
-    container_name: projet-postgres-test
     environment:
-      POSTGRES_PASSWORD: 'rootpassword'
-      POSTGRES_DB: 'test_db'
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: target_pg
     ports:
-      # Port de votre machine (hôte) : Port du conteneur
-      - "5432:5432"
+      - "5440:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_target_data:/var/lib/postgresql/data
 
-# Les 'volumes' permettent aux données de persister même si vous arrêtez le conteneur
+  mongo_target:
+    image: mongo:6
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+
 volumes:
+  postgres_app_data:
   mysql_data:
-  postgres_data:
+  postgres_target_data:
+  mongo_data:
+  backups_data:

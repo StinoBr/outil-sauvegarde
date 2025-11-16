@@ -1,8 +1,7 @@
 // backend/server/api/plans/[id]/execute.post.ts
 
-import { BackupService } from '~/server/services/BackupService';
-// 1. IMPORTER le type 'ShellResult' depuis notre utilitaire
-import type { ShellResult } from '~/server/utils/shellExecutor';
+import { BackupService } from '~/server/src/services/BackupService';
+import type { ShellResult } from '~/server/src/utils/process';
 
 // defineEventHandler est le constructeur d'endpoint de Nitro
 export default defineEventHandler(async (event) => {
