@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+# Atlas Backup UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Interface React professionnelle permettant d'orchestrer les sauvegardes/restaurations des SGBD gérées par le backend `outil-sauvegarde`.
 
-## Available Scripts
+## Stack & Design System
 
-In the project directory, you can run:
+- **React + React Router** : navigation par pages (dashboard, backups, restore, logs, settings, databases)
+- **Tailwind-like design system** : jeu d'utilitaires et de tokens (`src/styles`) compilé dans le repo pour éviter toute dépendance externe
+- **State management** : store inspiré de Zustand (`src/store`) avec actions asynchrones pour le polling, les backups/restores et la configuration
+- **API client** : `fetch` + mocks (`src/services`) pour consommer les endpoints du backend (`/backup`, `/restore`, `/logs`, `/databases`, `/status`, `/settings/*`)
+- **UI Components** : layout complet (Sidebar + Topbar), cartes, tableaux, badges, boutons, modales… adaptés au mode clair/sombre
 
-### `npm start`
+## Arborescence
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+src/
+├── app/
+│   ├── backup
+│   ├── dashboard
+│   ├── databases
+│   ├── logs
+│   ├── restore
+│   └── settings
+├── components/
+├── hooks/
+├── lib/
+├── services/
+├── store/
+└── styles/
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Chaque page consomme les hooks/stores pour déclencher les actions backend (ex : `triggerBackup`, `fetchLogs`, `updateSchedule`).
 
-### `npm test`
+## Lancer le frontend
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+cd frontend
+npm install   # (une fois les dépendances déjà présentes)
+npm start
+```
 
-### `npm run build`
+Le serveur démarre sur [http://localhost:3000](http://localhost:3000).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+> ℹ️ Les endpoints backend sont configurés via `REACT_APP_API_BASE_URL`. En absence de backend, les services tombent automatiquement sur des mocks réalistes (`services/mockData`).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Tests rapides
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run build    # vérifie la compilation CRA
+npm test         # tests unitaires CRA par défaut
+```
 
-### `npm run eject`
+## Améliorations UI/UX proposées
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. **Notifications temps-réel** : brancher un flux SSE/websocket pour mettre à jour les jobs sans polling.
+2. **Audit détaillé** : ajouter une vue Timeline par base avec comparaison des durées/taille de sauvegarde.
+3. **Playbooks restauration** : wizard en 3 étapes (choix snapshot → validation → monitoring) avec suivi de pourcentage.
+4. **Multi-tenancy** : tags d'environnement (Prod/Preprod/Dev) directement filtrables dans la sidebar.
+5. **Accessibilité** : intégrer un thème high-contrast et navigation clavier complète sur les tables/logs.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Notes
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Le design system (`styles/design-system.css` & `styles/utilities.css`) reprend une nomenclature Tailwind pour faciliter l'évolution vers un build Tailwind complet.
+- Le store maison expose la même ergonomie qu'un store Zustand (`createStore`), ce qui facilitera la migration si la dépendance peut être installée plus tard.
