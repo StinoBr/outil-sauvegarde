@@ -1,0 +1,35 @@
+# Fichier : G:/Projet Bright/Outil de sauvegarde/projet-master-sauvegarde/docker-compose.yml
+
+version: '3.8'
+
+services:
+  # --- Le service pour tester MySQL ---
+  mysql_test:
+    image: mysql:8.0
+    container_name: projet-mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: 'rootpassword'
+      MYSQL_DATABASE: 'test_db'
+    ports:
+      # Port de votre machine (hôte) : Port du conteneur
+      - "9000:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # --- Le service pour tester PostgreSQL ---
+  postgres_test:
+    image: postgres:14
+    container_name: projet-postgres-test
+    environment:
+      POSTGRES_PASSWORD: 'rootpassword'
+      POSTGRES_DB: 'test_db'
+    ports:
+      # Port de votre machine (hôte) : Port du conteneur
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# Les 'volumes' permettent aux données de persister même si vous arrêtez le conteneur
+volumes:
+  mysql_data:
+  postgres_data:

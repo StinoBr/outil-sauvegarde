@@ -1,0 +1,112 @@
+// Ce bloc définit la connexion à votre base de données
+// (nous utilisons PostgreSQL, comme pour le projet Django)
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Stocké dans un fichier .env
+}
+
+// Ce bloc configure le client Prisma pour JavaScript/TypeScript
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --- Définition des "Choix" (Types Enumérés) ---
+
+// Types de SGBD que nous supportons
+enum TypeSGBD {
+  PostgreSQL
+  MySQL
+  MongoDB
+  SQLite
+}
+
+// Statuts pour nos journaux
+enum StatutOperation {
+  EnCours
+  Succes
+  Echec
+}
+
+// --- Définition des Modèles (Tables) ---
+
+// Table 1 : SGBD_Cible
+model SGBDCible {
+  id                  Int               @id @default(autoincrement())
+  nomConnexion        String            @unique
+  typeSgbd            TypeSGBD          // Utilise notre Enum
+  adresseIp           String
+  port                Int
+  nomBaseDeDonnees    String
+  nomUtilisateur      String
+  motDePasse          String            // Sera chiffré par le service
+  
+  // Relation: Un SGBD Cible peut avoir plusieurs plans de sauvegarde
+  plans               PlanSauvegarde[]
+}
+
+// Table 2 : Destination_Stockage
+model DestinationStockage {
+  id                  Int               @id @default(autoincrement())
+  nomDestination      String            @unique
+  cheminLocal         String            //
+  
+  // Champs optionnels pour le cloud
+  cloudProvider       String?           // '?' signifie optionnel
+  cloudBucket         String?
+  cloudApiKey         String?           // Sera chiffré par le service
+  
+  // Relation: Une destination peut être utilisée par plusieurs plans
+  plans               PlanSauvegarde[]
+}
+
+// Table 3 : Plan_Sauvegarde
+model PlanSauvegarde {
+  id                  Int               @id @default(autoincrement())
+  nomPlan             String            @unique
+  frequenceCron       String            //
+  typeSauvegarde      String            // Ex: 'Complet', 'Incrémentiel'
+  compressionActivee  Boolean           @default(true) //
+  actif               Boolean           @default(true)
+
+  // --- Relations (Clés étrangères) ---
+  sgbdCibleId         Int
+  sgbdCible           SGBDCible         @relation(fields: [sgbdCibleId], references: [id])
+  
+  destinationId       Int
+  destination         DestinationStockage @relation(fields: [destinationId], references: [id])
+  
+  // Relation: Un plan a plusieurs entrées de journal
+  journauxSauvegarde  JournalSauvegarde[]
+}
+
+// Table 4 : Journal_Sauvegarde
+model JournalSauvegarde {
+  id                  Int               @id @default(autoincrement())
+  statut              StatutOperation   // Utilise notre Enum
+  heureDebut          DateTime          @default(now()) //
+  heureFin            DateTime?         // '?' optionnel, car 'EnCours'
+  dureeSecondes       Int?              //
+  tailleFichierOctet  BigInt?
+  cheminFichierLocal  String?
+  messageLog          String?           // Pour les erreurs
+  
+  // --- Relations (Clés étrangères) ---
+  planId              Int
+  plan                PlanSauvegarde    @relation(fields: [planId], references: [id])
+  
+  // Relation: Une sauvegarde peut avoir plusieurs tentatives de restauration
+  journauxRestauration JournalRestauration[]
+}
+
+// Table 5 : Journal_Restauration
+model JournalRestauration {
+  id                  Int               @id @default(autoincrement())
+  statut              StatutOperation
+  heureDebut          DateTime          @default(now())
+  heureFin            DateTime?
+  messageLog          String?           // Pour les erreurs
+  
+  // --- Relations (Clés étrangères) ---
+  sauvegardeId        Int
+  sauvegarde          JournalSauvegarde @relation(fields: [sauvegardeId], references: [id])
+}
