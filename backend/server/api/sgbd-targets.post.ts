@@ -2,7 +2,7 @@
 
 import { db } from '~/server/src/utils/db';
 import { encrypt } from '~/server/src/utils/crypto';
-import { TypeSGBD } from '@prisma/client';
+import type { TypeSGBD } from '@prisma/client';
 
 // defineEventHandler est le constructeur d'endpoint de Nitro
 export default defineEventHandler(async (event) => {
