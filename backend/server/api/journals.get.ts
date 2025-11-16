@@ -1,6 +1,6 @@
 // backend/server/api/journals.get.ts
 
-import { db } from '~/server/utils/db';
+import { db } from '~/server/src/utils/db';
 
 // --- Utilitaire pour convertir BigInt → Number avant JSON ---
 function fixBigInt(obj: any) {

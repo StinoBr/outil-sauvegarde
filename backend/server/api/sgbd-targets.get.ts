@@ -1,6 +1,6 @@
 // backend/server/api/sgbd-targets.get.ts
 
-import { db } from '~/server/utils/db';
+import { db } from '~/server/src/utils/db';
 
 // Cet endpoint va lister toutes les cibles SGBD
 export default defineEventHandler(async (event) => {
